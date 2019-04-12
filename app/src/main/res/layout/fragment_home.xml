@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".Fragments.HomeFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -10,5 +11,60 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/hello_blank_fragment" />
+    <RelativeLayout
+        android:layout_marginBottom="50dp"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.card.MaterialCardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:cardBackgroundColor="#fff"
+            app:cardCornerRadius="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/titlehome"
+                    android:textStyle="bold"
+                    android:textColor="#000"
+                    android:textSize="48sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="What would you want to dump today?"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_below="@id/titlehome"
+                    android:layout_above="@id/fabcam"
+                    android:layout_height="match_parent">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+
+                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+
+                    android:layout_width="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    app:backgroundTint="@color/colorAccent"
+                    app:icon="@drawable/baseline_camera_white_24"
+                    android:layout_height="50dp"
+                    android:id="@+id/fabcam"/>
+
+            </RelativeLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+    </RelativeLayout>
 
 </FrameLayout>
