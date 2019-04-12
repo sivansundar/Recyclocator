@@ -132,6 +132,8 @@
     </RelativeLayout>
 
     <LinearLayout
+
+        android:padding="10dp"
         android:layout_marginTop="30dp"
         android:orientation="vertical"
         android:layout_alignParentBottom="true"
@@ -139,93 +141,115 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-       <RelativeLayout
-           android:paddingLeft="10dp"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content">
-
-           <ImageView
-               android:layout_centerVertical="true"
-               android:id="@+id/moredumpsIcon"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:background="@drawable/round_more_vert_black_24"/>
-           <TextView
-                android:layout_toRightOf="@id/moredumpsIcon"
-               android:textColor="#000"
-               android:padding="18dp"
-               android:textStyle="bold"
-               android:textSize="20sp"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:text="View previous dumps"/>
-
-       </RelativeLayout>
-
-
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="#C9C9C9" />
-
-
-        <RelativeLayout
-            android:paddingLeft="10dp"
-
+        <com.google.android.material.card.MaterialCardView
+            app:cardBackgroundColor="#fff"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:cardCornerRadius="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <ImageView
-                android:layout_centerVertical="true"
-                android:id="@+id/referIcon"
-                android:src="@drawable/baseline_favorite_black_24"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:textColor="#000"
-                android:layout_toRightOf="@id/referIcon"
-                android:textStyle="bold"
-                android:padding="18dp"
-                android:textSize="20sp"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Refer a friend"/>
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:id="@+id/previousDumpsHolder"
+                    android:paddingLeft="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_centerVertical="true"
+                        android:id="@+id/previousDumpsIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round_more_vert_black_24"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="0dp"
+                        android:layout_toEndOf="@+id/previousDumpsIcon"
+                        android:layout_toRightOf="@id/previousDumpsIcon"
+                        android:padding="18dp"
+                        android:text="View previous dumps"
+                        android:textColor="#000"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
 
 
-        </RelativeLayout>
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="#C9C9C9" />
-
-        <RelativeLayout
-            android:paddingLeft="10dp"
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_centerVertical="true"
-                android:id="@+id/logoutIcon"
-                android:src="@drawable/round_exit_to_app_black_36"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="#C9C9C9" />
 
 
-            <TextView
-                android:textColor="#000"
-                android:layout_toRightOf="@id/logoutIcon"
-                android:textStyle="bold"
-                android:padding="18dp"
-                android:textSize="20sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Logout"/>
+                <RelativeLayout
+                    android:paddingLeft="10dp"
+                    android:id="@+id/referHolder"
 
-        </RelativeLayout>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_centerVertical="true"
+                        android:id="@+id/referIcon"
+                        android:src="@drawable/baseline_favorite_black_24"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:textColor="#000"
+                        android:layout_toRightOf="@id/referIcon"
+                        android:textStyle="bold"
+                        android:padding="18dp"
+                        android:textSize="20sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Refer a friend"/>
+
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="#C9C9C9" />
+
+                <RelativeLayout
+                    android:paddingLeft="10dp"
+                    android:id="@+id/logoutHolder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_centerVertical="true"
+                        android:id="@+id/logoutIcon"
+                        android:src="@drawable/round_exit_to_app_black_36"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:textColor="#000"
+                        android:layout_toRightOf="@id/logoutIcon"
+                        android:textStyle="bold"
+                        android:padding="18dp"
+                        android:textSize="20sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Logout"/>
+
+                </RelativeLayout>
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
 
 
 

@@ -1,6 +1,9 @@
 package com.kinomisfit.recyclocator.Fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,11 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -21,9 +32,12 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
+import com.kinomisfit.recyclocator.LoginActivity;
+import com.kinomisfit.recyclocator.PreviousDumpsActivity;
 import com.kinomisfit.recyclocator.R;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,6 +56,14 @@ public class DashboardFragment extends Fragment {
     TextView usernameText;
     @BindView(R.id.QRCode_image)
     ImageView QRCodeImage;
+    @BindView(R.id.total_dumps_text)
+    TextView totalDumpsText;
+    @BindView(R.id.total_rewards_text)
+    TextView totalRewardsText;
+    
+    RelativeLayout previousDumpsHolder;
+    RelativeLayout referHolder;
+    RelativeLayout logoutHolder;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -53,6 +75,8 @@ public class DashboardFragment extends Fragment {
     private FirebaseAuth mAuth;
 
     ImageView dpImageView;
+
+    public GoogleSignInClient mGoogleSignInClient;
 
     String UID = "";
 
@@ -98,6 +122,64 @@ public class DashboardFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance(); // Instance of DB
         databaseReference = mDatabase.getReference(); // Points to the root node
         mAuth = FirebaseAuth.getInstance();
+        
+        previousDumpsHolder = (RelativeLayout) view.findViewById(R.id.previousDumpsHolder);
+        logoutHolder = (RelativeLayout) view.findViewById(R.id.logoutHolder);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
+
+
+        logoutHolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+                alertDialogBuilder.setTitle("Log out?");
+                alertDialogBuilder.setView(R.layout.logout_alert_view);
+                alertDialogBuilder.setMessage("Are you sure you want to log out?");
+                alertDialogBuilder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        FirebaseAuth.getInstance().signOut();
+
+                        mGoogleSignInClient.signOut().addOnCompleteListener(getActivity(),
+                                new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(getContext(), LoginActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        startActivity(intent);
+                                    }
+                                });
+
+                    }
+                });
+
+                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getContext(), "Best decision", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                alertDialogBuilder.show();
+
+            }
+        });
+        
+        previousDumpsHolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+           //     Toast.makeText(getContext(), "Previous dumps", Toast.LENGTH_SHORT).show();
+
+                startActivity(new Intent(getContext(), PreviousDumpsActivity.class));
+            }
+        });
 
         return view;
     }
@@ -162,6 +244,8 @@ public class DashboardFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+  
 
     /**
      * This interface must be implemented by activities that contain this
