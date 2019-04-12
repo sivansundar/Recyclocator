@@ -1,6 +1,7 @@
 package com.kinomisfit.recyclocator.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.kinomisfit.recyclocator.Models.PendingListModel;
+import com.kinomisfit.recyclocator.PendingDumpsActivity;
 import com.kinomisfit.recyclocator.R;
 
 /**
@@ -130,6 +132,18 @@ public class HomeFragment extends Fragment {
 
                         pendingListViewHolder.setTitle(pendingListModel.getTitle());
                         pendingListViewHolder.setDesc(pendingListModel.getTimestamp());
+
+                        String postID = pendingListModel.getId();
+
+                        pendingListViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getContext(), PendingDumpsActivity.class);
+                                intent.putExtra("UID", UID);
+                                intent.putExtra("postID", postID);
+                                startActivity(intent);
+                            }
+                        });
                     }
 
                     @NonNull

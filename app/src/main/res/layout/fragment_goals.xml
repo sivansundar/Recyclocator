@@ -8,15 +8,30 @@
 
     <!-- TODO: Update blank fragment layout -->
     <RelativeLayout
-
+        android:layout_marginBottom="50dp"
+        android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+    <com.google.android.material.card.MaterialCardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:cardBackgroundColor="#fff"
+        app:cardCornerRadius="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TextView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/goals_recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Goals"/>
+            android:layout_height="match_parent">
+
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
     </RelativeLayout>
+
 
 </FrameLayout>

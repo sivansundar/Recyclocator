@@ -6,14 +6,35 @@ public class PendingListModel {
     String imgurl;
     String id;
     String timestamp;
+    String quantity;
+    String status;
 
     public PendingListModel() {}
 
-    public PendingListModel(String title, String imgurl, String id, String timestamp) {
+    public String getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public PendingListModel(String title, String imgurl, String id, String timestamp, String quantity, String status) {
         this.title = title;
         this.timestamp = timestamp;
         this.imgurl = imgurl;
         this.id = id;
+        this.quantity = quantity;
+        this.status = status;
+
     }
 
     public String getTitle() {

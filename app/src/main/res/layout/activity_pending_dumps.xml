@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".PendingDumpsActivity">
+
+    <RelativeLayout
+        android:layout_marginBottom="50dp"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.card.MaterialCardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:cardBackgroundColor="#fff"
+            app:cardCornerRadius="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    android:scaleType="centerCrop"
+                    android:background="@color/colorAccent"/>
+
+                <TextView
+                    android:id="@+id/title_pendingItem"
+                    android:layout_below="@id/image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Title"
+                    android:textColor="#000"
+                    android:textStyle="bold"
+                    android:textSize="28sp"/>
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipBackgroundColor="#D30000"
+                    android:text="Status"
+                    android:id="@+id/status_pendingItem"
+                    android:layout_below="@id/quantity_pendingItem"/>
+
+
+
+
+                <TextView
+                    android:id="@+id/quantity_pendingItem"
+                    android:layout_below="@id/title_pendingItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2"
+                    android:layout_marginRight="18dp"
+                    android:layout_alignParentRight="true"
+                    android:textColor="#000"
+                    android:textStyle="bold"
+                    android:textSize="20sp"/>
+
+
+                <com.google.android.material.chip.Chip
+                    android:layout_alignParentRight="true"
+                    android:text="SoftDrink"
+                    android:layout_below="@id/quantity_pendingItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+
+
+            </RelativeLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+    </RelativeLayout>
+</RelativeLayout>
