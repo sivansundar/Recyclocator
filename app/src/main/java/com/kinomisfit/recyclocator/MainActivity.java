@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class MainActiviry extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
     private TextView mTextMessage;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -36,7 +36,7 @@ public class MainActiviry extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_activiry);
+        setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         mTextMessage = findViewById(R.id.message);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

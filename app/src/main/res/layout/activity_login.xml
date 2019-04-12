@@ -17,55 +17,14 @@
         android:layout_height="wrap_content">
 
 
-       <com.google.android.material.textfield.TextInputLayout
-           android:layout_marginTop="50dp"
-           android:id="@+id/usernameHolder"
-
-           android:layout_centerHorizontal="true"
-           android:hint="Username"
-           android:textColorHint="#868686"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content">
-
-           <com.google.android.material.textfield.TextInputEditText
-               android:id="@+id/usernameInput"
-               android:background="#fff"
-               android:layout_width="250dp"
-               android:textColor="#000"
-               android:layout_height="wrap_content" />
-
-       </com.google.android.material.textfield.TextInputLayout>
 
 
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/passwordHolder"
-            android:layout_marginTop="20dp"
-           android:layout_below="@id/usernameHolder"
-            android:layout_centerHorizontal="true"
-            android:hint="Password"
-            android:textColorHint="#868686"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passwordInput"
-
-                android:background="#fff"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <com.google.android.material.button.MaterialButton
+        <com.google.android.gms.common.SignInButton
             app:cornerRadius="8dp"
             android:textColor="#000"
-
             app:rippleColor="@color/colorPrimary"
             android:layout_marginTop="30dp"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/passwordHolder"
             android:id="@+id/material_button"
             android:layout_width="200dp"
             android:layout_height="wrap_content"

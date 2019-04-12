@@ -14,20 +14,23 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,15 +43,16 @@ public class LoginActivity extends AppCompatActivity {
     public GoogleSignInClient mGoogleSignInClient;
 
     public FirebaseAuth mAuth;
+    public FirebaseDatabase mDatabase;
+    public DatabaseReference databaseReference;
 
-    @BindView(R.id.material_button)
-    MaterialButton materialButton;
-    @BindView(R.id.usernameInput)
-    TextInputEditText usernameInput;
-    @BindView(R.id.passwordInput)
-    TextInputEditText passwordInput;
 
     public GoogleApiClient mGoogleApiClient;
+    @BindView(R.id.material_button)
+    SignInButton materialButton;
+
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +62,18 @@ public class LoginActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance();
+        databaseReference = mDatabase.getReference();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() != null) {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                }
+            }
+        };
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.clientID))
                 .requestEmail()
@@ -83,10 +99,13 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-      //  updateUI(currentUser);
+        //  updateUI(currentUser);
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -117,7 +136,35 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            Toast.makeText(LoginActivity.this, "Welcome, " + task.getResult().getUser().getDisplayName(), Toast.LENGTH_SHORT).show();
+
+                            String name = task.getResult().getUser().getDisplayName();
+                            String dp_url = String.valueOf(task.getResult().getUser().getPhotoUrl());
+                            String emailID = task.getResult().getUser().getEmail();
+                            String uid = task.getResult().getUser().getUid();
+
+                            HashMap<String, Object> account = new HashMap<>();
+                            account.put("name", name);
+                            account.put("uid", uid);
+                            account.put("email", emailID);
+                            account.put("dp_url", dp_url);
+
+                                databaseReference.child("accounts").child(uid).setValue(account).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: Account created");
+                                }
+                            })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e(TAG, "onFailure: ", e);
+                                        }
+                                    });
+
+
+                            Snackbar.make(findViewById(R.id.mainHolder), "Welcome home, " + task.getResult().getUser().getDisplayName(), Snackbar.LENGTH_SHORT).show();
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
                             FirebaseUser user = mAuth.getCurrentUser();
                             //updateUI(user);
                         } else {
@@ -135,13 +182,6 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.material_button)
     public void onViewClicked() {
-
-        String username = usernameInput.getText().toString().trim();
-        String password = passwordInput.getText().toString().trim();
-
-
-             signIn();
-
-        Toast.makeText(this, "asjfhasdhf", Toast.LENGTH_SHORT).show();
+        signIn();
     }
 }
