@@ -1,26 +1,34 @@
 package com.kinomisfit.recyclocator.Fragments;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.kinomisfit.recyclocator.R;
+
+import butterknife.BindView;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link DashboardFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link DashboardFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -30,6 +38,10 @@ public class DashboardFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    @BindView(R.id.username_text)
+    TextView usernameText;
+    @BindView(R.id.QRCode_image)
+    ImageView QRCodeImage;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -102,16 +114,36 @@ public class DashboardFragment extends Fragment {
         super.onStart();
 
         dpImageView = (ImageView) getView().findViewById(R.id.dp_imageView);
-
+        usernameText = (TextView) getView().findViewById(R.id.username_text);
+        QRCodeImage = (ImageView) getView().findViewById(R.id.QRCode_image);
 
         UID = mAuth.getCurrentUser().getUid();
 
-        getDP(UID);
+        getQRCode();
+        getUserDetails(UID);
     }
 
-    private void getDP(String uid) {
+    private void getQRCode() {
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+
+        BitMatrix bitMatrix = null;
+        try {
+            bitMatrix = multiFormatWriter.encode(UID, BarcodeFormat.QR_CODE, 200, 200);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+        BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+        Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+        Glide.with(this).load(bitmap).into(QRCodeImage);
+    }
+
+    private void getUserDetails(String uid) {
         Uri url = mAuth.getCurrentUser().getPhotoUrl();
         Glide.with(this).load(url).into(dpImageView);
+
+        String username = mAuth.getCurrentUser().getDisplayName();
+
+        usernameText.setText(username);
     }
 
     @Override
