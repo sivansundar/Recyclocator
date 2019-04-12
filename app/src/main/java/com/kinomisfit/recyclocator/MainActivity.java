@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kinomisfit.recyclocator.Fragments.DashboardFragment;
+import com.kinomisfit.recyclocator.Fragments.GoalsFragment;
 import com.kinomisfit.recyclocator.Fragments.HomeFragment;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,14 +14,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.view.MenuItem;
-import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener,
-GoalsFragment.OnFragmentInteractionListener{
+        GoalsFragment.OnFragmentInteractionListener,
+        DashboardFragment.OnFragmentInteractionListener {
 
 
     private HomeFragment homeFragment;
     private GoalsFragment goalsFragment;
+    private DashboardFragment dashboardFragment;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -30,12 +33,12 @@ GoalsFragment.OnFragmentInteractionListener{
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     setFragment(homeFragment);
-
                     return true;
-                case R.id.navigation_dashboard:
+                case R.id.navigation_goals:
                     setFragment(goalsFragment);
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.navigation_dashboard:
+                    setFragment(dashboardFragment);
                     return true;
             }
             return false;
@@ -49,6 +52,8 @@ GoalsFragment.OnFragmentInteractionListener{
 
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +63,7 @@ GoalsFragment.OnFragmentInteractionListener{
 
         homeFragment = new HomeFragment();
         goalsFragment = new GoalsFragment();
+        dashboardFragment = new DashboardFragment();
 
         setFragment(homeFragment);
 

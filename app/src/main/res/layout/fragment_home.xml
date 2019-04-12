@@ -7,10 +7,7 @@
     tools:context=".Fragments.HomeFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+
     <RelativeLayout
         android:layout_marginBottom="50dp"
         android:padding="10dp"
@@ -30,15 +27,18 @@
                 android:layout_height="match_parent">
 
                 <TextView
+                    android:padding="10dp"
                     android:id="@+id/titlehome"
-                    android:textStyle="bold"
-                    android:textColor="#000"
-                    android:textSize="48sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="What would you want to dump today?"/>
+                    android:text="What would you want to dump today?"
+                    android:textColor="#000"
+                    android:textSize="48sp"
+                    android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/pending_recyclerView"
                     android:layout_width="match_parent"
                     android:layout_below="@id/titlehome"
                     android:layout_above="@id/fabcam"

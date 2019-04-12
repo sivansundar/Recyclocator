@@ -4,12 +4,23 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.kinomisfit.recyclocator.Models.PendingListModel;
 import com.kinomisfit.recyclocator.R;
 
 /**
@@ -29,6 +40,16 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference databaseReference;
+
+    private FirebaseAuth mAuth;
+
+    String UID = "";
+
+    private RecyclerView pendingRecyclerView;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,11 +87,92 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+
+        mDatabase = FirebaseDatabase.getInstance(); // Instance of DB
+        databaseReference = mDatabase.getReference(); // Points to the root node
+        mAuth = FirebaseAuth.getInstance();
+
+        pendingRecyclerView = (RecyclerView) view.findViewById(R.id.pending_recyclerView);
+        pendingRecyclerView.setHasFixedSize(true);
+        pendingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+    @Override
+    public void onStart() {
+        UID = mAuth.getCurrentUser().getUid();
+
+        refreshPendingList();
+        super.onStart();
+    }
+
+    private void refreshPendingList() {
+
+        Query query = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("pending_list")
+                .child(UID);
+
+        FirebaseRecyclerOptions<PendingListModel> options =
+                new FirebaseRecyclerOptions.Builder<PendingListModel>()
+                        .setQuery(query, PendingListModel.class)
+                        .build();
+
+        FirebaseRecyclerAdapter<PendingListModel, PendingListViewHolder> firebaseRecyclerAdapter =
+                new FirebaseRecyclerAdapter<PendingListModel, PendingListViewHolder>(options) {
+                    @Override
+                    protected void onBindViewHolder(@NonNull PendingListViewHolder pendingListViewHolder, int i, @NonNull PendingListModel pendingListModel) {
+
+
+                        pendingListViewHolder.setTitle(pendingListModel.getTitle());
+                        pendingListViewHolder.setDesc(pendingListModel.getTimestamp());
+                    }
+
+                    @NonNull
+                    @Override
+                    public PendingListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+                        View view = LayoutInflater.from(parent.getContext())
+                                .inflate(R.layout.pending_list_item, parent, false);
+
+                        return new PendingListViewHolder(view);
+                    }
+                };
+
+        pendingRecyclerView .setAdapter(firebaseRecyclerAdapter);
+        firebaseRecyclerAdapter.startListening();
+
+    }
+
+    public static class PendingListViewHolder extends RecyclerView.ViewHolder {
+        View mView;
+
+        public PendingListViewHolder(View itemView) {
+            super(itemView);
+            mView = itemView;
+
+        }
+
+        public void setTitle(String title) {
+            TextView titletext = (TextView) mView.findViewById(R.id.title_pl);
+            titletext.setText(title);
+
+        }
+
+        public void setDesc(String timestamp) {
+
+
+            TextView timestamptext = (TextView) mView.findViewById(R.id.timestamp_pl);
+            timestamptext.setText(timestamp);
+        }
+
+    }
+
+        // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
