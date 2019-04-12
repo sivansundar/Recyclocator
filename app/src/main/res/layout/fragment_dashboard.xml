@@ -2,14 +2,28 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/colorPrimary"
     android:layout_height="match_parent"
-
     tools:context=".Fragments.DashboardFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <RelativeLayout
+        android:layout_marginTop="60dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Dahsboard" />
+        android:layout_height="150dp">
+
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:id="@+id/dp_imageView"
+            android:layout_width="100dp"
+            android:layout_centerHorizontal="true"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_height="100dp"
+            android:src="@drawable/round_navigation_black_48"
+            app:civ_border_color="#000"
+            app:civ_border_width="6dp"
+           />
+
+    </RelativeLayout>
 
 </FrameLayout>

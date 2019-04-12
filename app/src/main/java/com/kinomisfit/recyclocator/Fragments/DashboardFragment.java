@@ -9,7 +9,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.kinomisfit.recyclocator.R;
 
 /**
@@ -29,6 +34,15 @@ public class DashboardFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference databaseReference;
+
+    private FirebaseAuth mAuth;
+
+    ImageView dpImageView;
+
+    String UID = "";
 
     private OnFragmentInteractionListener mListener;
 
@@ -67,7 +81,13 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dashboard, container, false);
+        View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
+
+        mDatabase = FirebaseDatabase.getInstance(); // Instance of DB
+        databaseReference = mDatabase.getReference(); // Points to the root node
+        mAuth = FirebaseAuth.getInstance();
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -75,6 +95,23 @@ public class DashboardFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        dpImageView = (ImageView) getView().findViewById(R.id.dp_imageView);
+
+
+        UID = mAuth.getCurrentUser().getUid();
+
+        getDP(UID);
+    }
+
+    private void getDP(String uid) {
+        Uri url = mAuth.getCurrentUser().getPhotoUrl();
+        Glide.with(this).load(url).into(dpImageView);
     }
 
     @Override
