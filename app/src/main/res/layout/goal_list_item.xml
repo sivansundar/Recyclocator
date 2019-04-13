@@ -39,7 +39,7 @@
                     android:max="100"
                     android:minHeight="50dp"
                     android:minWidth="400dp"
-                    android:progress="35"
+                    android:progress="2"
                     />
 
             </RelativeLayout>
