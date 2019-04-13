@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.kinomisfit.recyclocator.CameraActivity;
 import com.kinomisfit.recyclocator.Models.PendingListModel;
+import com.kinomisfit.recyclocator.NavigateDumpsActivity;
 import com.kinomisfit.recyclocator.PendingDumpsActivity;
 import com.kinomisfit.recyclocator.R;
 
@@ -170,6 +172,15 @@ public class HomeFragment extends Fragment {
                         pendingListViewHolder.setTitle(pendingListModel.getTitle());
                         pendingListViewHolder.setDesc(pendingListModel.getTimestamp());
 
+                        ImageView navigationImg = (ImageView) pendingListViewHolder.mView.findViewById(R.id.navigate);
+
+                        navigationImg.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                startActivity(new Intent(getContext(), NavigateDumpsActivity.class));
+                            }
+                        });
+
                         String postID = pendingListModel.getId();
 
                         pendingListViewHolder.mView.setOnClickListener(new View.OnClickListener() {
@@ -223,6 +234,7 @@ public class HomeFragment extends Fragment {
             TextView timestamptext = (TextView) mView.findViewById(R.id.timestamp_pl);
             timestamptext.setText(timestamp);
         }
+
 
     }
 

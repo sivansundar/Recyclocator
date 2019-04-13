@@ -1,19 +1,38 @@
 package com.kinomisfit.recyclocator;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.kinomisfit.recyclocator.Models.DumpLocationsModel;
 
 public class NavigateDumpsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+
+    public FirebaseDatabase mDatabase;
+    public DatabaseReference databaseReference;
+
+    private static final String TAG = "NavigateDumps : ";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +42,68 @@ public class NavigateDumpsActivity extends FragmentActivity implements OnMapRead
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mDatabase = FirebaseDatabase.getInstance();
+        databaseReference = mDatabase.getReference();
+
+
+
+        getDumpSpots();
+    }
+
+    private void getDumpSpots() {
+
+        Toast.makeText(this, "getDumpSpots clicked", Toast.LENGTH_SHORT).show();
+
+        databaseReference.child("dumpLocations").child("BLR").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+
+                    DumpLocationsModel model = new DumpLocationsModel();
+                    model.setId(ds.getValue(DumpLocationsModel.class).getId());
+                    model.setLatitude(ds.getValue(DumpLocationsModel.class).getLatitude());
+                    model.setLongitude(ds.getValue(DumpLocationsModel.class).getLongitude());
+                    model.setTitle(ds.getValue(DumpLocationsModel.class).getTitle());
+
+                    LatLng location = new LatLng(model.getLatitude(), model.getLongitude());
+
+                    mMap.addMarker(new MarkerOptions().position(location).title(model.getTitle()));
+
+                    mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+
+
+                            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + location.latitude + ", " + location.longitude);
+
+                            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+
+                            mapIntent.setPackage("com.google.android.apps.maps");
+
+
+                            startActivity(mapIntent);
+
+
+
+
+                            Toast.makeText(NavigateDumpsActivity.this, ""+ marker.getPosition().latitude, Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                    });
+
+                    Log.d(TAG, "onDataChange: " + model.getLatitude() + "\n" + model.getId());
+                }
+}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
 
@@ -40,9 +121,15 @@ public class NavigateDumpsActivity extends FragmentActivity implements OnMapRead
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng blore = new LatLng(12.97, 77.59);
+        mMap.addMarker(new MarkerOptions().position(blore).title("Dump spot in Bangalore"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(blore));
+        mMap.setMinZoomPreference(12);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setTiltGesturesEnabled(true);
+
+
 
 
     }
