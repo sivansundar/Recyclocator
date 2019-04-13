@@ -138,7 +138,6 @@ public class DashboardFragment extends Fragment {
             public void onClick(View v) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
                 alertDialogBuilder.setTitle("Log out?");
-                alertDialogBuilder.setView(R.layout.logout_alert_view);
                 alertDialogBuilder.setMessage("Are you sure you want to log out?");
                 alertDialogBuilder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     @Override

@@ -4,31 +4,40 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
+import com.camerakit.CameraKitView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.kinomisfit.recyclocator.CameraActivity;
 import com.kinomisfit.recyclocator.Models.PendingListModel;
 import com.kinomisfit.recyclocator.PendingDumpsActivity;
 import com.kinomisfit.recyclocator.R;
 
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -38,6 +47,11 @@ public class HomeFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    ExtendedFloatingActionButton fabcam;
+    @BindView(R.id.camera)
+    CameraKitView camera;
+    @BindView(R.id.mainLayout)
+    RelativeLayout mainLayout;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -52,6 +66,10 @@ public class HomeFragment extends Fragment {
 
     private RecyclerView pendingRecyclerView;
 
+
+    private static final int REQUEST_CAPTURE_IMAGE = 100;
+
+    private ArrayList permissions = new ArrayList();
 
     private OnFragmentInteractionListener mListener;
 
@@ -86,6 +104,9 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    int click = 1;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -97,9 +118,24 @@ public class HomeFragment extends Fragment {
         databaseReference = mDatabase.getReference(); // Points to the root node
         mAuth = FirebaseAuth.getInstance();
 
+        fabcam = (ExtendedFloatingActionButton) view.findViewById(R.id.fabcam);
+
+        mainLayout = (RelativeLayout) view.findViewById(R.id.mainLayout);
+        camera = (CameraKitView) view.findViewById(R.id.camera);
+
+
         pendingRecyclerView = (RecyclerView) view.findViewById(R.id.pending_recyclerView);
         pendingRecyclerView.setHasFixedSize(true);
         pendingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        fabcam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(getContext(), CameraActivity.class));
+
+            }
+        });
 
         return view;
     }
@@ -111,6 +147,7 @@ public class HomeFragment extends Fragment {
         refreshPendingList();
         super.onStart();
     }
+
 
     private void refreshPendingList() {
 
@@ -157,10 +194,13 @@ public class HomeFragment extends Fragment {
                     }
                 };
 
-        pendingRecyclerView .setAdapter(firebaseRecyclerAdapter);
+        pendingRecyclerView.setAdapter(firebaseRecyclerAdapter);
         firebaseRecyclerAdapter.startListening();
 
     }
+
+
+
 
     public static class PendingListViewHolder extends RecyclerView.ViewHolder {
         View mView;
@@ -186,7 +226,7 @@ public class HomeFragment extends Fragment {
 
     }
 
-        // TODO: Rename method, update argument and hook method into UI event
+    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

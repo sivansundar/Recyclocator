@@ -21,59 +21,143 @@
             android:layout_height="match_parent">
 
             <RelativeLayout
-                android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                >
+
+                android:padding="10dp">
 
                 <ImageView
                     android:id="@+id/image"
                     android:layout_width="match_parent"
                     android:layout_height="280dp"
-                    android:scaleType="centerCrop"
-                    android:background="@color/colorAccent"/>
+                    android:background="@color/colorAccent"
+                    android:scaleType="centerCrop" />
 
                 <TextView
                     android:id="@+id/title_pendingItem"
-                    android:layout_below="@id/image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/image"
                     android:text="Title"
                     android:textColor="#000"
-                    android:textStyle="bold"
-                    android:textSize="28sp"/>
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
 
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:chipBackgroundColor="#D30000"
-                    android:text="Status"
-                    android:id="@+id/status_pendingItem"
-                    android:layout_below="@id/quantity_pendingItem"/>
-
-
-
-
-                <TextView
-                    android:id="@+id/quantity_pendingItem"
+                <RelativeLayout
+                    android:id="@+id/detailsHolder"
                     android:layout_below="@id/title_pendingItem"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="2"
-                    android:layout_marginRight="18dp"
-                    android:layout_alignParentRight="true"
-                    android:textColor="#000"
-                    android:textStyle="bold"
-                    android:textSize="20sp"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/status_pendingItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Status"
+                        android:layout_alignParentLeft="true"
+                        app:chipBackgroundColor="#D30000" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/typeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:text="SoftDrink" />
+
+                </RelativeLayout>
 
 
-                <com.google.android.material.chip.Chip
-                    android:layout_alignParentRight="true"
-                    android:text="SoftDrink"
-                    android:layout_below="@id/quantity_pendingItem"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                <RelativeLayout
+                    android:layout_below="@id/detailsHolder"
+                    android:id="@+id/quantityHolder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
+
+                    <TextView
+                        android:id="@+id/quantity_pendingItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginRight="18dp"
+                        android:text="2"
+                        android:textColor="#000"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+
+                </RelativeLayout>
+
+
+
+
+                <LinearLayout
+                    android:layout_marginTop="50dp"
+                    android:id="@+id/controlsHolder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/quantityHolder"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+
+                        android:id="@+id/navigationHolder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        //Open activity to maps
+
+                        <ImageView
+                            android:id="@+id/navigationIcon"
+                            android:layout_width="150dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/outline_navigation_black_36" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@id/navigationIcon"
+                            android:text="Navigate to Dump"
+                            android:textColor="#000"
+                            android:textSize="26sp"
+                            android:textStyle="italic" />
+
+
+
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#C9C9C9" />
+
+                    <RelativeLayout
+                        android:id="@+id/TrashHolder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/trashIcon"
+                            android:layout_width="150dp"
+                            android:layout_height="100dp"
+                            android:layout_alignParentRight="true"
+                            android:src="@drawable/baseline_delete_outline_black_36" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_centerHorizontal="true"
+                            android:textAlignment="center"
+                            android:text="Delete"
+                            android:textColor="#000"
+                            android:textSize="26sp"
+                            android:textStyle="italic" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
 
 
             </RelativeLayout>

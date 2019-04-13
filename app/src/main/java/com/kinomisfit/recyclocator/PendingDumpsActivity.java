@@ -1,7 +1,10 @@
 package com.kinomisfit.recyclocator;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +21,7 @@ import com.kinomisfit.recyclocator.Models.PendingListModel;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class PendingDumpsActivity extends AppCompatActivity {
 
@@ -34,6 +38,12 @@ public class PendingDumpsActivity extends AppCompatActivity {
     Chip statusPendingItem;
     @BindView(R.id.quantity_pendingItem)
     TextView quantityPendingItem;
+    @BindView(R.id.typeText)
+    Chip typeText;
+    @BindView(R.id.navigationHolder)
+    RelativeLayout navigationHolder;
+    @BindView(R.id.TrashHolder)
+    RelativeLayout DeleteHolder;
 
 
     @Override
@@ -57,6 +67,8 @@ public class PendingDumpsActivity extends AppCompatActivity {
                 titlePendingItem.setText(model.getTitle());
                 quantityPendingItem.setText(model.getQuantity());
                 statusPendingItem.setText(model.getStatus());
+                typeText.setText(model.getType());
+
 
             }
 
@@ -67,5 +79,18 @@ public class PendingDumpsActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @OnClick({R.id.navigationHolder, R.id.TrashHolder})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.navigationHolder:
+
+                startActivity(new Intent(PendingDumpsActivity.this, NavigateDumpsActivity.class));
+
+                break;
+            case R.id.TrashHolder:
+                break;
+        }
     }
 }

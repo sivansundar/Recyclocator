@@ -8,7 +8,11 @@
 
     <!-- TODO: Update blank fragment layout -->
 
+
+
+
     <RelativeLayout
+        android:id="@+id/mainLayout"
         android:layout_marginBottom="50dp"
         android:padding="10dp"
         android:layout_width="match_parent"

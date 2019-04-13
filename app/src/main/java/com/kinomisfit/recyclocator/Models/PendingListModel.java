@@ -5,6 +5,7 @@ public class PendingListModel {
     String title;
     String imgurl;
     String id;
+    String type;
     String timestamp;
     String quantity;
     String status;
@@ -27,10 +28,19 @@ public class PendingListModel {
         this.status = status;
     }
 
-    public PendingListModel(String title, String imgurl, String id, String timestamp, String quantity, String status) {
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public PendingListModel(String title, String imgurl, String id, String timestamp, String quantity, String status, String type) {
         this.title = title;
         this.timestamp = timestamp;
         this.imgurl = imgurl;
+        this.type = type;
         this.id = id;
         this.quantity = quantity;
         this.status = status;

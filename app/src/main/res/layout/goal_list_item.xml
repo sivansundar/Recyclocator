@@ -36,10 +36,10 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:indeterminate="false"
-                    android:max="50"
+                    android:max="100"
                     android:minHeight="50dp"
                     android:minWidth="400dp"
-                    android:progress="20"
+                    android:progress="35"
                     />
 
             </RelativeLayout>
