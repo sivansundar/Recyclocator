@@ -1,8 +1,11 @@
 package com.kinomisfit.recyclocator;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -146,6 +149,20 @@ public class CameraActivity extends AppCompatActivity {
                 Glide.with(getApplicationContext()).load(bytes).into(imageView);
                 camera.setVisibility(View.INVISIBLE);
 
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(CameraActivity.this);
+                alert.setTitle("Add trash to your list?");
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogLayout = inflater.inflate(R.layout.add_trash_alertdialog, null);
+                alert.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                
+                alert.setView(dialogLayout);
+                alert.show();
 
 
 
