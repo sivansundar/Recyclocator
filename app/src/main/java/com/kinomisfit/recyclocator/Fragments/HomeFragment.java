@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.camerakit.CameraKitView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -66,6 +69,9 @@ public class HomeFragment extends Fragment {
 
     String UID = "";
 
+    private static final String TAG = "Home Fragment : ";
+
+
     private RecyclerView pendingRecyclerView;
 
 
@@ -106,7 +112,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    int click = 1;
+
 
 
     @Override
@@ -168,11 +174,33 @@ public class HomeFragment extends Fragment {
                     @Override
                     protected void onBindViewHolder(@NonNull PendingListViewHolder pendingListViewHolder, int i, @NonNull PendingListModel pendingListModel) {
 
+                        String postID = pendingListModel.getId();
 
                         pendingListViewHolder.setTitle(pendingListModel.getTitle());
                         pendingListViewHolder.setDesc(pendingListModel.getTimestamp());
 
                         ImageView navigationImg = (ImageView) pendingListViewHolder.mView.findViewById(R.id.navigate);
+
+                        ImageView trashImg = (ImageView) pendingListViewHolder.mView.findViewById(R.id.trashIcon);
+
+                        trashImg.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                databaseReference.child("pending_list").child(UID).child(postID).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                        .addOnFailureListener(new OnFailureListener() {
+
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e(TAG, "onFailure: ", e );
+                                            }
+                                        });
+                            }
+                        });
 
                         navigationImg.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -181,7 +209,6 @@ public class HomeFragment extends Fragment {
                             }
                         });
 
-                        String postID = pendingListModel.getId();
 
                         pendingListViewHolder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override

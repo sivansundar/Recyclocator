@@ -9,6 +9,8 @@ public class PendingListModel {
     String timestamp;
     String quantity;
     String status;
+    String imgname;
+
 
     public PendingListModel() {}
 
@@ -36,10 +38,19 @@ public class PendingListModel {
         this.type = type;
     }
 
-    public PendingListModel(String title, String imgurl, String id, String timestamp, String quantity, String status, String type) {
+    public String getImgname() {
+        return imgname;
+    }
+
+    public void setImgname(String imgname) {
+        this.imgname = imgname;
+    }
+
+    public PendingListModel(String title, String imgurl, String id, String timestamp, String quantity, String status, String type, String imgname) {
         this.title = title;
         this.timestamp = timestamp;
         this.imgurl = imgurl;
+        this.imgname = imgname;
         this.type = type;
         this.id = id;
         this.quantity = quantity;

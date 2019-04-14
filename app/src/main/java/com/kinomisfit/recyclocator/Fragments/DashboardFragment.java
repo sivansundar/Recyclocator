@@ -25,14 +25,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.kinomisfit.recyclocator.LoginActivity;
+import com.kinomisfit.recyclocator.Models.UserModel;
 import com.kinomisfit.recyclocator.PreviousDumpsActivity;
 import com.kinomisfit.recyclocator.R;
 
@@ -122,6 +126,9 @@ public class DashboardFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance(); // Instance of DB
         databaseReference = mDatabase.getReference(); // Points to the root node
         mAuth = FirebaseAuth.getInstance();
+
+        totalDumpsText = (TextView) view.findViewById(R.id.total_dumps_text);
+        totalRewardsText = (TextView) view.findViewById(R.id.total_rewards_text);
         
         previousDumpsHolder = (RelativeLayout) view.findViewById(R.id.previousDumpsHolder);
         logoutHolder = (RelativeLayout) view.findViewById(R.id.logoutHolder);
@@ -225,6 +232,27 @@ public class DashboardFragment extends Fragment {
         String username = mAuth.getCurrentUser().getDisplayName();
 
         usernameText.setText(username);
+
+
+        databaseReference.child("accounts").child(UID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                UserModel userModel = new UserModel();
+                userModel.setDumps(dataSnapshot.getValue(UserModel.class).getDumps());
+                userModel.setRewards(dataSnapshot.getValue(UserModel.class).getRewards());
+
+                totalDumpsText.setText(userModel.getDumps());
+                totalRewardsText.setText(userModel.getRewards());
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override

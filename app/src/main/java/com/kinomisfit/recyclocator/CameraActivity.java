@@ -1,29 +1,29 @@
 package com.kinomisfit.recyclocator;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.camerakit.CameraKitView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.firebase.ml.common.FirebaseMLException;
-import com.google.firebase.ml.common.modeldownload.FirebaseLocalModel;
-import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions;
-import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
-import com.google.firebase.ml.custom.FirebaseModelDataType;
 import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
 import com.google.firebase.ml.custom.FirebaseModelInterpreter;
-import com.google.firebase.ml.custom.FirebaseModelOptions;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,6 +42,8 @@ public class CameraActivity extends AppCompatActivity {
     CameraKitView camera;
     @BindView(R.id.fabcam)
     ExtendedFloatingActionButton fabcam;
+    @BindView(R.id.imageView)
+    ImageView imageView;
 
     private FirebaseModelInterpreter mInterpreter;
 
@@ -62,7 +64,6 @@ public class CameraActivity extends AppCompatActivity {
     private static final int DIM_IMG_SIZE_Y = 224;
 
     private static final int RESULTS_TO_SHOW = 3;
-
 
 
     private final PriorityQueue<Map.Entry<String, Float>> sortedLabels =
@@ -92,13 +93,11 @@ public class CameraActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         ButterKnife.bind(this);
-
 
 
     }
@@ -108,9 +107,8 @@ public class CameraActivity extends AppCompatActivity {
         super.onStart();
         camera.onStart();
 
-       
-    }
 
+    }
 
 
     @Override
@@ -140,9 +138,50 @@ public class CameraActivity extends AppCompatActivity {
     @OnClick(R.id.fabcam)
     public void onViewClicked() {
 
+        // Open Alert Dialog with custom view. Name and number. Upload.
         camera.captureImage(new CameraKitView.ImageCallback() {
             @Override
             public void onImage(CameraKitView cameraKitView, byte[] bytes) {
+                imageView.setVisibility(View.VISIBLE);
+                Glide.with(getApplicationContext()).load(bytes).into(imageView);
+                camera.setVisibility(View.INVISIBLE);
+
+
+
+
+                FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
+                        .setWidth(480)   // 480x360 is typically sufficient for
+                        .setHeight(360)  // image recognition
+                        .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
+                        .build();
+
+                FirebaseVisionImage image = FirebaseVisionImage.fromByteArray(bytes, metadata);
+
+
+                FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance()
+                        .getOnDeviceImageLabeler();
+
+                labeler.processImage(image)
+                        .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
+                            @Override
+                            public void onSuccess(List<FirebaseVisionImageLabel> firebaseVisionImageLabels) {
+                                for (FirebaseVisionImageLabel label : firebaseVisionImageLabels) {
+                                    String text = label.getText();
+                                    String entityId = label.getEntityId();
+                                    float confidence = label.getConfidence();
+
+
+                                    Log.d(TAG, "onSuccess: " + text + "\n" + entityId + "\n" + confidence);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "onFailure: ", e);
+                            }
+                        });
+
 
                 //processbyte data to bitmap
                 //set up custom model using the final package code in the other window
@@ -151,11 +190,7 @@ public class CameraActivity extends AppCompatActivity {
                 //obtain values and just Toast them
 
 
-
-
-
-
-                            }
+            }
         });
     }
 }

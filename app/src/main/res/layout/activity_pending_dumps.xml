@@ -30,8 +30,8 @@
                     android:id="@+id/image"
                     android:layout_width="match_parent"
                     android:layout_height="280dp"
-                    android:background="@color/colorAccent"
-                    android:scaleType="centerCrop" />
+                    android:background="@drawable/lays"
+                    android:scaleType="fitCenter" />
 
                 <TextView
                     android:id="@+id/title_pendingItem"

@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-ml-vision:19.0.3'
     implementation 'com.google.firebase:firebase-ml-vision-face-model:17.0.2'
     implementation 'com.google.firebase:firebase-ml-model-interpreter:18.0.0'
-
+    implementation 'com.google.firebase:firebase-storage:16.1.0'
 
     implementation 'com.firebaseui:firebase-ui-database:4.3.1'
 
