@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +19,9 @@ import com.camerakit.CameraKitView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
 import com.google.firebase.ml.custom.FirebaseModelInterpreter;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -28,8 +33,11 @@ import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -48,52 +56,13 @@ public class CameraActivity extends AppCompatActivity {
     @BindView(R.id.imageView)
     ImageView imageView;
 
-    private FirebaseModelInterpreter mInterpreter;
+    public FirebaseDatabase mDatabase;
+    public DatabaseReference databaseReference;
 
-    private FirebaseModelInputOutputOptions mDataOptions;
-
-    private List<String> mLabelList;
-
-
-    private static final String HOSTED_MODEL_NAME = "cloud_model_1";
-    private static final String LOCAL_MODEL_ASSET = "mobilenet_v1_1.0_224_quant.tflite";
-
-    private static final String LABEL_PATH = "//assets//labels.txt";
+    public FirebaseAuth mAuth;
 
 
-    private static final int DIM_BATCH_SIZE = 1;
-    private static final int DIM_PIXEL_SIZE = 3;
-    private static final int DIM_IMG_SIZE_X = 224;
-    private static final int DIM_IMG_SIZE_Y = 224;
 
-    private static final int RESULTS_TO_SHOW = 3;
-
-
-    private final PriorityQueue<Map.Entry<String, Float>> sortedLabels =
-            new PriorityQueue<>(
-                    RESULTS_TO_SHOW,
-                    new Comparator<Map.Entry<String, Float>>() {
-                        @Override
-                        public int compare(Map.Entry<String, Float> o1, Map.Entry<String, Float>
-                                o2) {
-                            return (o1.getValue()).compareTo(o2.getValue());
-                        }
-                    });
-
-    private List<String> loadLabelList(Activity activity) {
-        List<String> labelList = new ArrayList<>();
-        try (BufferedReader reader =
-                     new BufferedReader(new InputStreamReader(activity.getAssets().open
-                             (LABEL_PATH)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                labelList.add(line);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to read label list.", e);
-        }
-        return labelList;
-    }
 
 
     @Override
@@ -102,6 +71,10 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         ButterKnife.bind(this);
 
+        mDatabase = FirebaseDatabase.getInstance();
+        databaseReference = mDatabase.getReference();
+
+        mAuth = FirebaseAuth.getInstance();
 
     }
 
@@ -154,13 +127,54 @@ public class CameraActivity extends AppCompatActivity {
                 alert.setTitle("Add trash to your list?");
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogLayout = inflater.inflate(R.layout.add_trash_alertdialog, null);
+                EditText titletext = (EditText) dialogLayout.findViewById(R.id.title_edittext);
+                EditText numbertext = (EditText) dialogLayout.findViewById(R.id.number_edittext);
+
                 alert.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
+                        String title = titletext.getText().toString().trim();
+                        String number = numbertext.getText().toString().trim();
+                        byte[] imgArray = bytes;
+
+                        String UID = mAuth.getCurrentUser().getUid();
+
+
+                        String key = mDatabase.getReference("pending_list/" + UID).push().getKey();
+
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh-mm-ss");
+                        String format = simpleDateFormat.format(new Date());
+                        String time = format.replaceAll("-", ":");
+
+                        HashMap<String, Object> item = new HashMap<>();
+                        item.put("id", key);
+                        item.put("title", title);
+                        item.put("quantity", number);
+                        item.put("status", "Incomplete");
+                        item.put("type", "Non-Biodegradable");
+                        item.put("timestamp", time);
+                        //item.put("imgArray", imgArray);
+                        
+
+                        databaseReference.child("pending_list").child(UID).child(key).setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(CameraActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.e(TAG, "onFailure: ",e );
+                                        Toast.makeText(CameraActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+
                     }
                 });
-                
+
                 alert.setView(dialogLayout);
                 alert.show();
 
