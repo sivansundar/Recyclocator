@@ -141,6 +141,8 @@ public class LoginActivity extends AppCompatActivity {
                             account.put("uid", uid);
                             account.put("email", emailID);
                             account.put("dp_url", dp_url);
+                            account.put("dumps", "74");
+                            account.put("rewards", "3");
 
                                 databaseReference.child("accounts").child(uid).setValue(account).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

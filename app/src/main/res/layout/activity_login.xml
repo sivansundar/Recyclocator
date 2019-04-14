@@ -8,7 +8,12 @@
     android:background="@color/colorPrimary"
     tools:context=".LoginActivity">
 
-
+<ImageView
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/logo"/>
 
     <RelativeLayout
         android:layout_marginBottom="150dp"
@@ -33,8 +38,18 @@
             app:backgroundTint="#fff"
             android:text="Login"/>
 
+      </RelativeLayout>
 
-
-    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="80dp"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#fff"
+        android:layout_centerHorizontal="true"
+        android:text="Pick-up • Dump • Offers"/>
 
 </RelativeLayout>
