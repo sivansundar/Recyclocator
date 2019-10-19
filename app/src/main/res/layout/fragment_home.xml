@@ -51,6 +51,17 @@
                 </androidx.recyclerview.widget.RecyclerView>
 
 
+                <TextView
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/pendingDumpNumber"
+                    android:text="No trash pending"
+                    android:textColor="#000"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </TextView>
+
                 <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
                     android:layout_width="50dp"

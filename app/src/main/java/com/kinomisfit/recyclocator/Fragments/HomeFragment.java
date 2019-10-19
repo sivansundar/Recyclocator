@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -27,23 +28,31 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.camerakit.CameraKitView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.kinomisfit.recyclocator.CameraActivity;
+import com.google.firebase.database.ValueEventListener;
 import com.kinomisfit.recyclocator.Models.PendingListModel;
 import com.kinomisfit.recyclocator.NavigateDumpsActivity;
 import com.kinomisfit.recyclocator.PendingDumpsActivity;
 import com.kinomisfit.recyclocator.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -81,6 +90,7 @@ public class HomeFragment extends Fragment {
 
 
     private RecyclerView pendingRecyclerView;
+    public TextView pendingDumpNumber;
 
 
     private static final int REQUEST_CAPTURE_IMAGE = 100;
@@ -121,8 +131,6 @@ public class HomeFragment extends Fragment {
     }
 
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -139,6 +147,10 @@ public class HomeFragment extends Fragment {
         mainLayout = (RelativeLayout) view.findViewById(R.id.mainLayout);
         camera = (CameraKitView) view.findViewById(R.id.camera);
 
+        pendingDumpNumber = view.findViewById(R.id.pendingDumpNumber);
+
+        getPendingDumpList();
+
 
         pendingRecyclerView = (RecyclerView) view.findViewById(R.id.pending_recyclerView);
         pendingRecyclerView.setHasFixedSize(true);
@@ -152,13 +164,38 @@ public class HomeFragment extends Fragment {
 
 
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(takePictureIntent, 1001);
+                startActivityForResult(takePictureIntent, 1001);
 
 
             }
         });
 
+
         return view;
+    }
+
+    private void getPendingDumpList() {
+
+        databaseReference.child("pending_list").child(UID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int count = (int) dataSnapshot.getChildrenCount();
+                Log.d(TAG, "onDataChange: Count : " + count);
+                if (count > 0) {
+
+                    pendingDumpNumber.setVisibility(View.GONE);
+                }
+                else {
+                    pendingDumpNumber.setVisibility(View.VISIBLE);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -175,12 +212,44 @@ public class HomeFragment extends Fragment {
                 View dialogLayout = inflater.inflate(R.layout.add_trash_alertdialog, null);
                 EditText titletext = (EditText) dialogLayout.findViewById(R.id.title_edittext);
                 EditText numbertext = (EditText) dialogLayout.findViewById(R.id.number_edittext);
+                Button yesAddTrashBtn = dialogLayout.findViewById(R.id.yesButton);
                 ImageView trashImage = dialogLayout.findViewById(R.id.trashImage);
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                 alert.setTitle("Add trash to your list?");
                 alert.setView(dialogLayout);
-                alert.show();
+                alert.setCancelable(false);
+
+                AlertDialog alertDialog = alert.show();
+
+
+                yesAddTrashBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String title = titletext.getText().toString().trim();
+                        String number = numbertext.getText().toString().trim();
+
+                        if (title.isEmpty() && number.isEmpty()) {
+                            Toast.makeText(getContext(), "What do you want to dump & how many?", Toast.LENGTH_LONG).show();
+                        } else {
+                            String UID = mAuth.getCurrentUser().getUid();
+
+                            String key = databaseReference.child("pending_list").child(UID).push().getKey();
+
+                            HashMap<String, Object> item = new HashMap<>();
+                            item.put("id", key);
+                            item.put("title", title);
+                            item.put("quantity", number);
+                            item.put("status", "Incomplete");
+                            item.put("type", "Non-Biodegradable");
+                            item.put("timestamp", getTime());
+                            item.put("date", getDate());
+
+                            addPost(item, UID, key);
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
 
 
                 trashImage.setImageBitmap(imageBitmap);
@@ -189,6 +258,55 @@ public class HomeFragment extends Fragment {
             }
         }
 
+    }
+
+    private void addPost(HashMap<String, Object> item, String userID, String postKey) {
+
+        databaseReference.child("pending_list").child(userID).child(postKey).setValue(item).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getContext(), "Trash added! Go DUMP now :D", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Error - Could not add trash");
+                    alert.setMessage("Could not add trash because - " + task.getException().getLocalizedMessage());
+                    alert.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    alert.show();
+                }
+            }
+        });
+    }
+
+    private String getTime() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+        String time = simpleDateFormat.format(calendar.getTime());
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i <= 4; i++) {
+
+            sb.append(time.charAt(i));
+
+
+        }
+
+        String currentTime = sb.toString();
+
+        return currentTime;
+    }
+
+    private String getDate() {
+        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        Log.d(TAG, "onClick: DATE : " + date);
+
+        return date;
     }
 
     @Override
@@ -239,7 +357,7 @@ public class HomeFragment extends Fragment {
 
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Log.e(TAG, "onFailure: ", e );
+                                                Log.e(TAG, "onFailure: ", e);
                                             }
                                         });
                             }
@@ -279,8 +397,6 @@ public class HomeFragment extends Fragment {
         firebaseRecyclerAdapter.startListening();
 
     }
-
-
 
 
     public static class PendingListViewHolder extends RecyclerView.ViewHolder {
