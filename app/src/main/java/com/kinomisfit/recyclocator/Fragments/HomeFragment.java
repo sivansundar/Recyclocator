@@ -1,19 +1,25 @@
 package com.kinomisfit.recyclocator.Fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,6 +44,8 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -140,12 +148,47 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(getContext(), CameraActivity.class));
+                //startActivity(new Intent(getContext(), CameraActivity.class));
+
+
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(takePictureIntent, 1001);
+
 
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1001) {
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+
+                Log.d(TAG, "onActivityResult: uri : " + data.getData());
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogLayout = inflater.inflate(R.layout.add_trash_alertdialog, null);
+                EditText titletext = (EditText) dialogLayout.findViewById(R.id.title_edittext);
+                EditText numbertext = (EditText) dialogLayout.findViewById(R.id.number_edittext);
+                ImageView trashImage = dialogLayout.findViewById(R.id.trashImage);
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                alert.setTitle("Add trash to your list?");
+                alert.setView(dialogLayout);
+                alert.show();
+
+
+                trashImage.setImageBitmap(imageBitmap);
+
+
+            }
+        }
+
     }
 
     @Override

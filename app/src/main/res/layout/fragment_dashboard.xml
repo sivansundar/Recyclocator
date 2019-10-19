@@ -23,7 +23,7 @@
             android:layout_centerHorizontal="true"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_height="100dp"
-            android:src="@drawable/round_navigation_black_48"
+            android:src="@drawable/common_google_signin_btn_icon_dark"
             app:civ_border_color="#000"
             app:civ_border_width="6dp"
             />
@@ -40,7 +40,7 @@
             android:textColor="#000"
             android:textSize="20dp"
             android:textStyle="bold"
-            android:text="This is a dummy text"/>
+            android:text="Username"/>
 
     </RelativeLayout>
 
@@ -164,8 +164,7 @@
                         android:id="@+id/previousDumpsIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/round_more_vert_black_24"/>
-
+/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -198,7 +197,6 @@
                     <ImageView
                         android:layout_centerVertical="true"
                         android:id="@+id/referIcon"
-                        android:src="@drawable/baseline_favorite_black_24"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
@@ -229,7 +227,6 @@
                     <ImageView
                         android:layout_centerVertical="true"
                         android:id="@+id/logoutIcon"
-                        android:src="@drawable/round_exit_to_app_black_36"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 

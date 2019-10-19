@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         };
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.clientID))
+                .requestIdToken("561173750054-9okbvb0rp7sq4pia3ip1d5jjsv3dfs9s.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
 
@@ -144,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
                             account.put("dumps", "74");
                             account.put("rewards", "3");
 
-                                databaseReference.child("accounts").child(uid).setValue(account).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            databaseReference.child("accounts").child(uid).setValue(account).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "onSuccess: Account created");

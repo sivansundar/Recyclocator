@@ -35,9 +35,9 @@
                     android:id="@+id/titlehome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="What would you want to dump today?"
+                    android:text="Pending trash"
                     android:textColor="#000"
-                    android:textSize="48sp"
+                    android:textSize="28sp"
                     android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -59,7 +59,6 @@
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="10dp"
                     app:backgroundTint="@color/colorAccent"
-                    app:icon="@drawable/baseline_camera_white_24"
                     android:layout_height="50dp"
                     android:id="@+id/fabcam"/>
 

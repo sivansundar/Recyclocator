@@ -35,7 +35,6 @@
             android:layout_marginRight="20dp"
             android:layout_marginBottom="10dp"
             app:backgroundTint="@color/colorAccent"
-            app:icon="@drawable/baseline_camera_white_24"
             android:layout_height="50dp"
             android:id="@+id/fabcam"/>
 

@@ -73,4 +73,12 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        finish();
+        finishAffinity();
+    }
 }
