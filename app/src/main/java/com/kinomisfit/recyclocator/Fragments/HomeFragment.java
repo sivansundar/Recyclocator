@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.camerakit.CameraKitView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -49,9 +50,12 @@ import com.kinomisfit.recyclocator.Models.PendingListModel;
 import com.kinomisfit.recyclocator.NavigateDumpsActivity;
 import com.kinomisfit.recyclocator.PendingDumpsActivity;
 import com.kinomisfit.recyclocator.R;
+import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.enums.EPickType;
+import com.vansuita.pickimage.listeners.IPickClick;
+import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -191,9 +195,72 @@ public class HomeFragment extends Fragment {
               //  takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, file);
 
                 //startActivityForResult(takePictureIntent, 1001);
+                PickImageDialog.build(setup).setOnPickResult(new IPickResult() {
+                    @Override
+                    public void onPickResult(PickResult pickResult) {
 
-                PickImageDialog.build(setup).show(getFragmentManager());
+                        Log.d(TAG, "onPickResult: URI : " + pickResult.getUri());
 
+
+
+                        LayoutInflater inflater = getLayoutInflater();
+                        View dialogLayout = inflater.inflate(R.layout.add_trash_alertdialog, null);
+                        EditText titletext = (EditText) dialogLayout.findViewById(R.id.title_edittext);
+                        EditText numbertext = (EditText) dialogLayout.findViewById(R.id.number_edittext);
+                        Button yesAddTrashBtn = dialogLayout.findViewById(R.id.yesButton);
+                        Button noAddTrashBtn = dialogLayout.findViewById(R.id.noButton);
+
+                        ImageView trashImage = dialogLayout.findViewById(R.id.trashImage);
+                        Glide.with(getContext()).load(pickResult.getUri()).into(trashImage);
+
+
+                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                        alert.setTitle("Add trash to your list?");
+                        alert.setView(dialogLayout);
+                        alert.setCancelable(false);
+
+                        AlertDialog alertDialog = alert.show();
+
+
+                        yesAddTrashBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String title = titletext.getText().toString().trim();
+                                String number = numbertext.getText().toString().trim();
+
+                                if (title.isEmpty() && number.isEmpty()) {
+                                    Toast.makeText(getContext(), "What do you want to dump & how many?", Toast.LENGTH_LONG).show();
+                                } else {
+                                    String UID = mAuth.getCurrentUser().getUid();
+
+                                    String key = databaseReference.child("pending_list").child(UID).push().getKey();
+
+                                    HashMap<String, Object> item = new HashMap<>();
+                                    item.put("id", key);
+                                    item.put("title", title);
+                                    item.put("quantity", number);
+                                    item.put("status", "Incomplete");
+                                    item.put("type", "Non-Biodegradable");
+                                    item.put("timestamp", getTime());
+                                    item.put("date", getDate());
+
+                                    addPost(item, UID, key);
+                                    alertDialog.dismiss();
+                                }
+                            }
+                        });
+
+
+                        noAddTrashBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dismiss();
+                            }
+                        });
+
+
+                    }
+                }).show(getFragmentManager());
 
             }
         });

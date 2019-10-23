@@ -31,13 +31,32 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/trashImage"
-        android:layout_width="150dp"
-        android:layout_height="200dp">
 
-    </ImageView>
+        <ImageView
+            android:id="@+id/trashImage"
+            android:layout_width="150dp"
+            android:layout_height="200dp">
+
+        </ImageView>
+
+        <TextView
+            android:padding="10dp"
+            android:textColor="#fff"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:text="Processed Model data \n Type : Degradable / Non degradable"
+            android:layout_toRightOf="@id/trashImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </TextView>
+
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_marginTop="30dp"
