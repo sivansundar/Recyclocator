@@ -5,22 +5,27 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +49,11 @@ import com.kinomisfit.recyclocator.Models.PendingListModel;
 import com.kinomisfit.recyclocator.NavigateDumpsActivity;
 import com.kinomisfit.recyclocator.PendingDumpsActivity;
 import com.kinomisfit.recyclocator.R;
+import com.vansuita.pickimage.bundle.PickSetup;
+import com.vansuita.pickimage.dialog.PickImageDialog;
+import com.vansuita.pickimage.enums.EPickType;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -156,15 +165,34 @@ public class HomeFragment extends Fragment {
         pendingRecyclerView.setHasFixedSize(true);
         pendingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+
+        PickSetup setup = new PickSetup()
+                .setBackgroundColor(Color.parseColor("#173152"))
+                .setTitleColor(Color.WHITE)
+                .setButtonTextColor(Color.WHITE)
+                .setProgressText("Loading")
+                .setCancelText("Cancel")
+                .setFlip(true)
+                .setMaxSize(500)
+                .setCancelTextColor(Color.WHITE)
+                .setCameraIcon(R.drawable.baseline_camera_alt_white_36)
+                .setPickTypes(EPickType.CAMERA)
+                .setIconGravity(Gravity.LEFT)
+                .setButtonOrientation(LinearLayout.VERTICAL)
+                .setSystemDialog(false);
+
         fabcam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 //startActivity(new Intent(getContext(), CameraActivity.class));
-
-
+               // Uri file = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "pic_"+ String.valueOf(System.currentTimeMillis()) + ".jpg"));
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(takePictureIntent, 1001);
+              //  takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, file);
+
+                //startActivityForResult(takePictureIntent, 1001);
+
+                PickImageDialog.build(setup).show(getFragmentManager());
 
 
             }
@@ -207,7 +235,8 @@ public class HomeFragment extends Fragment {
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
 
 
-                Log.d(TAG, "onActivityResult: uri : " + data.getData());
+
+                //Log.d(TAG, "onActivityResult: uri : " + String.valueOf(data.get));
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogLayout = inflater.inflate(R.layout.add_trash_alertdialog, null);
                 EditText titletext = (EditText) dialogLayout.findViewById(R.id.title_edittext);
@@ -250,6 +279,8 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 });
+
+
 
 
                 trashImage.setImageBitmap(imageBitmap);

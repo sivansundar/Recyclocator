@@ -181,41 +181,6 @@ public class CameraActivity extends AppCompatActivity {
                 alert.show();
 
 
-
-                FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
-                        .setWidth(480)   // 480x360 is typically sufficient for
-                        .setHeight(360)  // image recognition
-                        .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
-                        .build();
-
-                FirebaseVisionImage image = FirebaseVisionImage.fromByteArray(bytes, metadata);
-
-
-                FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance()
-                        .getOnDeviceImageLabeler();
-
-                labeler.processImage(image)
-                        .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
-                            @Override
-                            public void onSuccess(List<FirebaseVisionImageLabel> firebaseVisionImageLabels) {
-                                for (FirebaseVisionImageLabel label : firebaseVisionImageLabels) {
-                                    String text = label.getText();
-                                    String entityId = label.getEntityId();
-                                    float confidence = label.getConfidence();
-
-
-                                    Log.d(TAG, "onSuccess: " + text + "\n" + entityId + "\n" + confidence);
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "onFailure: ", e);
-                            }
-                        });
-
-
                 //processbyte data to bitmap
                 //set up custom model using the final package code in the other window
                 //set up local model values.
