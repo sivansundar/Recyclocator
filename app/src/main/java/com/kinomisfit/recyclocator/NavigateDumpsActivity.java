@@ -3,6 +3,8 @@ package com.kinomisfit.recyclocator;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,6 +35,8 @@ public class NavigateDumpsActivity extends FragmentActivity implements OnMapRead
 
     private static final String TAG = "NavigateDumps : ";
 
+    AlertDialog.Builder alert;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,8 @@ public class NavigateDumpsActivity extends FragmentActivity implements OnMapRead
 
         mDatabase = FirebaseDatabase.getInstance();
         databaseReference = mDatabase.getReference();
+
+       alert = new AlertDialog.Builder(this);
 
 
 
@@ -68,6 +74,10 @@ public class NavigateDumpsActivity extends FragmentActivity implements OnMapRead
                     model.setLongitude(ds.getValue(DumpLocationsModel.class).getLongitude());
                     model.setTitle(ds.getValue(DumpLocationsModel.class).getTitle());
 
+
+                    String title = ds.getValue(DumpLocationsModel.class).getTitle();
+
+
                     LatLng location = new LatLng(model.getLatitude(), model.getLongitude());
 
                     mMap.addMarker(new MarkerOptions().position(location).title(model.getTitle()));
@@ -76,20 +86,39 @@ public class NavigateDumpsActivity extends FragmentActivity implements OnMapRead
                         @Override
                         public boolean onMarkerClick(Marker marker) {
 
-
-                            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + location.latitude + ", " + location.longitude);
-
-                            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-
-                            mapIntent.setPackage("com.google.android.apps.maps");
-
-
-                            startActivity(mapIntent);
+                            alert.setTitle(marker.getTitle());
+                            alert.setMessage("Navigate to '" + marker.getTitle()  + "'?");
+                            alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
 
+                                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + location.latitude + ", " + location.longitude);
+
+                                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+
+                                    mapIntent.setPackage("com.google.android.apps.maps");
 
 
-                            Toast.makeText(NavigateDumpsActivity.this, ""+ marker.getPosition().latitude, Toast.LENGTH_SHORT).show();
+                                    startActivity(mapIntent);
+
+                                }
+                            });
+                            alert.setNeutralButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            });
+                            alert.show();
+
+/*
+*/
+
+
+
+
+                            Toast.makeText(NavigateDumpsActivity.this, "Navigating to "+ marker.getPosition().latitude + ", " +  marker.getPosition().longitude,Toast.LENGTH_SHORT).show();
                             return false;
                         }
                     });

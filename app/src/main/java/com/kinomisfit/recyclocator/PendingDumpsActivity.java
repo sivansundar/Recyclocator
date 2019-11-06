@@ -60,6 +60,7 @@ public class PendingDumpsActivity extends AppCompatActivity {
     private static final String TAG = "Pending dump";
 
 
+    String imageURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,10 +89,12 @@ public class PendingDumpsActivity extends AppCompatActivity {
                 statusPendingItem.setText(model.getStatus());
                 typeText.setText(model.getType());
 
-                String imagename = model.getImgname();
                 String id = model.getId();
+                imageURL = model.getImgUrl();
 
-               //Refer the storage class to pull out images // KinoMisfits
+                Glide.with(PendingDumpsActivity.this).load(imageURL).into(image);
+
+                //Refer the storage class to pull out images // KinoMisfits
 
 
 

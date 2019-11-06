@@ -3,13 +3,12 @@ package com.kinomisfit.recyclocator.Models;
 public class PendingListModel {
 
     String title;
-    String imgurl;
     String id;
     String type;
     String timestamp;
     String quantity;
     String status;
-    String imgname;
+    String imgUrl;
 
 
     public PendingListModel() {}
@@ -30,6 +29,24 @@ public class PendingListModel {
         this.status = status;
     }
 
+    public PendingListModel(String title, String id, String type, String timestamp, String quantity, String status, String imgUrl) {
+        this.title = title;
+        this.id = id;
+        this.type = type;
+        this.timestamp = timestamp;
+        this.quantity = quantity;
+        this.status = status;
+        this.imgUrl = imgUrl;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
     public String getType() {
         return type;
     }
@@ -38,25 +55,7 @@ public class PendingListModel {
         this.type = type;
     }
 
-    public String getImgname() {
-        return imgname;
-    }
 
-    public void setImgname(String imgname) {
-        this.imgname = imgname;
-    }
-
-    public PendingListModel(String title, String imgurl, String id, String timestamp, String quantity, String status, String type, String imgname) {
-        this.title = title;
-        this.timestamp = timestamp;
-        this.imgurl = imgurl;
-        this.imgname = imgname;
-        this.type = type;
-        this.id = id;
-        this.quantity = quantity;
-        this.status = status;
-
-    }
 
     public String getTitle() {
         return title;
@@ -74,13 +73,7 @@ public class PendingListModel {
         this.title = title;
     }
 
-    public String getImgurl() {
-        return imgurl;
-    }
 
-    public void setImgurl(String imgurl) {
-        this.imgurl = imgurl;
-    }
 
     public String getId() {
         return id;

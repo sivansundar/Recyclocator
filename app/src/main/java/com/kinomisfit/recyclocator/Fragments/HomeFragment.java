@@ -1,6 +1,7 @@
 package com.kinomisfit.recyclocator.Fragments;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,8 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,7 +24,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +37,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,6 +45,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.kinomisfit.recyclocator.Models.PendingListModel;
 import com.kinomisfit.recyclocator.NavigateDumpsActivity;
 import com.kinomisfit.recyclocator.PendingDumpsActivity;
@@ -54,10 +56,8 @@ import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.enums.EPickType;
-import com.vansuita.pickimage.listeners.IPickClick;
 import com.vansuita.pickimage.listeners.IPickResult;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -92,12 +92,19 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    public View rootView;
+
+
     private FirebaseDatabase mDatabase;
     private DatabaseReference databaseReference;
 
+    private StorageReference mStorage;
     private FirebaseAuth mAuth;
 
     String UID = "";
+    Uri image;
+
+    public ProgressDialog mProgressDialog;
 
     private static final String TAG = "Home Fragment : ";
 
@@ -148,13 +155,17 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        rootView = inflater.inflate(R.layout.fragment_home, container, false);
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         // Inflate the layout for this fragment
 
         mDatabase = FirebaseDatabase.getInstance(); // Instance of DB
         databaseReference = mDatabase.getReference(); // Points to the root node
+        mStorage = FirebaseStorage.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
+        mProgressDialog = new ProgressDialog(getContext());
         fabcam = (ExtendedFloatingActionButton) view.findViewById(R.id.fabcam);
 
         mainLayout = (RelativeLayout) view.findViewById(R.id.mainLayout);
@@ -189,12 +200,6 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                //startActivity(new Intent(getContext(), CameraActivity.class));
-               // Uri file = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "pic_"+ String.valueOf(System.currentTimeMillis()) + ".jpg"));
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-              //  takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, file);
-
-                //startActivityForResult(takePictureIntent, 1001);
                 PickImageDialog.build(setup).setOnPickResult(new IPickResult() {
                     @Override
                     public void onPickResult(PickResult pickResult) {
@@ -243,6 +248,8 @@ public class HomeFragment extends Fragment {
                                     item.put("type", "Non-Biodegradable");
                                     item.put("timestamp", getTime());
                                     item.put("date", getDate());
+
+                                    image = pickResult.getUri();
 
                                     addPost(item, UID, key);
                                     alertDialog.dismiss();
@@ -293,80 +300,92 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
-        if (resultCode == RESULT_OK) {
-            if (requestCode == 1001) {
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-
-
-
-                //Log.d(TAG, "onActivityResult: uri : " + String.valueOf(data.get));
-                LayoutInflater inflater = getLayoutInflater();
-                View dialogLayout = inflater.inflate(R.layout.add_trash_alertdialog, null);
-                EditText titletext = (EditText) dialogLayout.findViewById(R.id.title_edittext);
-                EditText numbertext = (EditText) dialogLayout.findViewById(R.id.number_edittext);
-                Button yesAddTrashBtn = dialogLayout.findViewById(R.id.yesButton);
-                ImageView trashImage = dialogLayout.findViewById(R.id.trashImage);
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                alert.setTitle("Add trash to your list?");
-                alert.setView(dialogLayout);
-                alert.setCancelable(false);
-
-                AlertDialog alertDialog = alert.show();
-
-
-                yesAddTrashBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String title = titletext.getText().toString().trim();
-                        String number = numbertext.getText().toString().trim();
-
-                        if (title.isEmpty() && number.isEmpty()) {
-                            Toast.makeText(getContext(), "What do you want to dump & how many?", Toast.LENGTH_LONG).show();
-                        } else {
-                            String UID = mAuth.getCurrentUser().getUid();
-
-                            String key = databaseReference.child("pending_list").child(UID).push().getKey();
-
-                            HashMap<String, Object> item = new HashMap<>();
-                            item.put("id", key);
-                            item.put("title", title);
-                            item.put("quantity", number);
-                            item.put("status", "Incomplete");
-                            item.put("type", "Non-Biodegradable");
-                            item.put("timestamp", getTime());
-                            item.put("date", getDate());
-
-                            addPost(item, UID, key);
-                            alertDialog.dismiss();
-                        }
-                    }
-                });
-
-
-
-
-                trashImage.setImageBitmap(imageBitmap);
-
-
-            }
-        }
-
-    }
 
     private void addPost(HashMap<String, Object> item, String userID, String postKey) {
+        mProgressDialog.setTitle("Posting");
+        mProgressDialog.setMessage("Posting trash to pending list...");
+        mProgressDialog.show();
+
 
         databaseReference.child("pending_list").child(userID).child(postKey).setValue(item).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(getContext(), "Trash added! Go DUMP now :D", Toast.LENGTH_SHORT).show();
+
+                    StorageReference filePath = mStorage.child(UID).child(postKey).child(image.getLastPathSegment());
+
+                    filePath.putFile(image).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                            //getDownloadURL
+
+                            Uri img = image;
+                            String filename = img.getLastPathSegment();
+
+                            Log.d(TAG, "onComplete: URI : " + img);
+                            if (task.isSuccessful()) {
+
+                                Toast.makeText(getContext(), "Upload success", Toast.LENGTH_SHORT).show();
+                                
+                                filePath.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Uri> task) {
+
+                                        if (task.isSuccessful()) {
+
+                                            mProgressDialog.dismiss();
+
+                                            String downloadUrl = task.getResult().toString();
+
+                                            Log.d(TAG, "onSuccess: downloadUrl : " + downloadUrl);
+
+                                            HashMap<String, Object> downloadurlhash = new HashMap<>();
+                                            downloadurlhash.put("imgUrl", downloadUrl);
+
+
+                                            databaseReference.child("pending_list").child(UID).child(postKey).updateChildren(downloadurlhash).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                    if (task.isSuccessful()) {
+
+                                                        Snackbar snackbar = Snackbar
+                                                                .make(rootView, "Trash uploaded successfully", Snackbar.LENGTH_LONG);
+
+                                                        snackbar.show();
+
+                                                    }
+                                                    else {
+                                                        mProgressDialog.dismiss();
+                                                    }
+
+                                                }
+                                            });
+                                        }
+
+                                        else {
+                                            Toast.makeText(getContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }
+
+
+                            else
+                            {
+                                mProgressDialog.dismiss();
+                                Toast.makeText(getContext(), "ERROR : " + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    });
+
                 }
                 else {
+                    mProgressDialog.dismiss();
+
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                     alert.setTitle("Error - Could not add trash");
                     alert.setMessage("Could not add trash because - " + task.getException().getLocalizedMessage());
@@ -461,13 +480,13 @@ public class HomeFragment extends Fragment {
                             }
                         });
 
-                        navigationImg.setOnClickListener(new View.OnClickListener() {
+                        /*navigationImg.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 startActivity(new Intent(getContext(), NavigateDumpsActivity.class));
                             }
                         });
-
+*/
 
                         pendingListViewHolder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
