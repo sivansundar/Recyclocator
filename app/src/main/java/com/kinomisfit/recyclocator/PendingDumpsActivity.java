@@ -1,22 +1,19 @@
 package com.kinomisfit.recyclocator;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -53,9 +50,9 @@ public class PendingDumpsActivity extends AppCompatActivity {
     @BindView(R.id.typeText)
     Chip typeText;
     @BindView(R.id.navigationHolder)
-    RelativeLayout navigationHolder;
-    @BindView(R.id.TrashHolder)
-    RelativeLayout DeleteHolder;
+    LinearLayout navigationHolder;
+    @BindView(R.id.trashIconHolder)
+    LinearLayout trashIconHolder;
 
     private static final String TAG = "Pending dump";
 
@@ -99,6 +96,7 @@ public class PendingDumpsActivity extends AppCompatActivity {
 
 
 
+
             }
 
             @Override
@@ -108,30 +106,33 @@ public class PendingDumpsActivity extends AppCompatActivity {
         });
 
 
-        DeleteHolder.setOnClickListener(new View.OnClickListener() {
+        trashIconHolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                databaseReference.child("pending_list").child(UID).child(postID).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+                databaseReference.child("pending_list").child(UID).child(postID).removeValue(new DatabaseReference.CompletionListener() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
 
-                        Toast.makeText(PendingDumpsActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-                        finish();
+                        String error = databaseError.getDetails();
+
+                        if (!error.isEmpty()) {
+
+                            Toast.makeText(PendingDumpsActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+
+
+                            Log.d(TAG, "onFailure: " + error);
+
+                        }
                     }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-
-                                Log.e(TAG, "onFailure: ", e);
-                            }
-                        });
+                });
             }
         });
 
     }
 
-    @OnClick({R.id.navigationHolder, R.id.TrashHolder})
+    @OnClick({R.id.navigationHolder, R.id.trashIconHolder})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.navigationHolder:
@@ -139,7 +140,7 @@ public class PendingDumpsActivity extends AppCompatActivity {
                 startActivity(new Intent(PendingDumpsActivity.this, NavigateDumpsActivity.class));
 
                 break;
-            case R.id.TrashHolder:
+            case R.id.trashIconHolder:
                 break;
         }
     }

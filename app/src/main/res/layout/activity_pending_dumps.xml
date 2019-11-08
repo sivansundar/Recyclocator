@@ -9,14 +9,13 @@
 
     <RelativeLayout
         android:layout_marginBottom="50dp"
-        android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.google.android.material.card.MaterialCardView
             xmlns:app="http://schemas.android.com/apk/res-auto"
             app:cardBackgroundColor="#fff"
-            app:cardCornerRadius="30dp"
+            app:cardElevation="8dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -26,18 +25,27 @@
 
                 android:padding="10dp">
 
-                <ImageView
-                    android:id="@+id/image"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/imageCard"
                     android:layout_width="match_parent"
-                    android:layout_height="280dp"
-                    android:background="#121212"
-                    android:scaleType="fitCenter" />
+                    android:layout_height="280dp">
+
+                    <ImageView
+                        android:id="@+id/image"
+                        android:layout_width="match_parent"
+                        android:layout_height="280dp"
+                        android:background="#fff"
+                        android:scaleType="fitCenter" />
+
+
+                </com.google.android.material.card.MaterialCardView>
 
                 <TextView
+                    android:layout_below="@id/imageCard"
                     android:id="@+id/title_pendingItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/image"
+                    android:layout_marginTop="30dp"
                     android:text="Title"
                     android:textColor="#000"
                     android:textSize="28sp"
@@ -97,64 +105,62 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_below="@id/quantityHolder"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
-                    <RelativeLayout
-
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:id="@+id/navigationHolder"
-                        android:layout_width="match_parent"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:id="@+id/navigationIcon"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/outline_navigation_black_48" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Navigate"
+                            android:textColor="#000"
+                            android:textSize="18sp"
+                            android:textStyle="italic" />
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:id="@+id/trashIconHolder"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingLeft="20dp"
                         android:layout_height="wrap_content">
 
                         //Open activity to maps
 
                         <ImageView
-                            android:id="@+id/navigationIcon"
-                            android:layout_width="150dp"
-                            android:layout_height="100dp"
-                            android:src="@drawable/common_full_open_on_phone" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_toRightOf="@id/navigationIcon"
-                            android:text="Navigate to Dump"
-                            android:textColor="#000"
-                            android:textSize="26sp"
-                            android:textStyle="italic" />
-
-
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#C9C9C9" />
-
-                    <RelativeLayout
-                        android:id="@+id/TrashHolder"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <ImageView
+                            android:layout_width="wrap_content"
                             android:id="@+id/trashIcon"
-                            android:layout_width="150dp"
-                            android:layout_height="100dp"
-                            android:layout_alignParentRight="true"
-                />
-                        <TextView
-                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_centerHorizontal="true"
-                            android:textAlignment="center"
+                            android:layout_gravity="center"
+                            android:src="@drawable/round_delete_outline_black_48" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_height="wrap_content"
                             android:text="Delete"
                             android:textColor="#000"
-                            android:textSize="26sp"
+                            android:textSize="18sp"
                             android:textStyle="italic" />
 
-                    </RelativeLayout>
+                    </LinearLayout>
+
 
                 </LinearLayout>
 
