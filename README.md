@@ -12,12 +12,11 @@ This is a win-win sittuation for both parties involved.
 * ZXING Library to generate QR Code
 * Firebase Auth, Realtime Database and Storage
 * Firebase ML Kit to host our retrained model
-* Tensorflow Lite(*)
+* Tensorflow Lite
 * Glide to processes images
 * CameraKit
 
-(*) We are facing issues with respect to integrating the `.tflite` files into our project and hence we are sticking to the existing Labling vision API of Firebase MLKit. 
-We are working on getting this set up right away.
+
 
 
 
