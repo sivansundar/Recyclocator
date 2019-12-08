@@ -37,6 +37,7 @@
 
 
         <ImageView
+            android:background="@drawable/sample"
             android:id="@+id/trashImage"
             android:layout_width="150dp"
             android:layout_height="200dp">

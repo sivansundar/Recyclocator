@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,15 +50,16 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.kinomisfit.recyclocator.Models.PendingListModel;
-import com.kinomisfit.recyclocator.NavigateDumpsActivity;
 import com.kinomisfit.recyclocator.PendingDumpsActivity;
 import com.kinomisfit.recyclocator.R;
+import com.kinomisfit.recyclocator.TFProcessor.ImageClassifier;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.enums.EPickType;
 import com.vansuita.pickimage.listeners.IPickResult;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,8 +68,6 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import butterknife.BindView;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -94,6 +94,10 @@ public class HomeFragment extends Fragment {
 
     public View rootView;
 
+    private static final String HANDLE_THREAD_NAME = "TFModelBackground";
+    private final Object lock = new Object();
+
+
 
     private FirebaseDatabase mDatabase;
     private DatabaseReference databaseReference;
@@ -107,10 +111,14 @@ public class HomeFragment extends Fragment {
     public ProgressDialog mProgressDialog;
 
     private static final String TAG = "Home Fragment : ";
-
+    public Bitmap globalBitmap;
+    public Uri imageUri;
+    public ImageView trashImage;
 
     private RecyclerView pendingRecyclerView;
     public TextView pendingDumpNumber;
+    public ImageClassifier classifier;
+    private boolean runClassifier = false;
 
 
     private static final int REQUEST_CAPTURE_IMAGE = 100;
@@ -118,6 +126,10 @@ public class HomeFragment extends Fragment {
     private ArrayList permissions = new ArrayList();
 
     private OnFragmentInteractionListener mListener;
+    private HandlerThread backgroundThread;
+    private Handler backgroundHandler;
+
+
 
     public HomeFragment() {
         // Required empty public constructor
@@ -156,6 +168,12 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
+
+        try {
+            classifier = new ImageClassifier(getActivity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         // Inflate the layout for this fragment
@@ -204,9 +222,12 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onPickResult(PickResult pickResult) {
 
-                        Log.d(TAG, "onPickResult: URI : " + pickResult.getUri());
+
+                        imageUri = pickResult.getUri();
 
 
+                        globalBitmap = pickResult.getBitmap();
+                        Log.d(TAG, "onPickResult: BM : " + globalBitmap);
 
                         LayoutInflater inflater = getLayoutInflater();
                         View dialogLayout = inflater.inflate(R.layout.add_trash_alertdialog, null);
@@ -215,9 +236,10 @@ public class HomeFragment extends Fragment {
                         Button yesAddTrashBtn = dialogLayout.findViewById(R.id.yesButton);
                         Button noAddTrashBtn = dialogLayout.findViewById(R.id.noButton);
 
-                        ImageView trashImage = dialogLayout.findViewById(R.id.trashImage);
+                        trashImage = dialogLayout.findViewById(R.id.trashImage);
                         Glide.with(getContext()).load(pickResult.getUri()).into(trashImage);
 
+                        //classifier.classifyFrame(globalBitmap);
 
                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                         alert.setTitle("Add trash to your list?");
@@ -225,6 +247,7 @@ public class HomeFragment extends Fragment {
                         alert.setCancelable(false);
 
                         AlertDialog alertDialog = alert.show();
+
 
 
                         yesAddTrashBtn.setOnClickListener(new View.OnClickListener() {
@@ -265,7 +288,15 @@ public class HomeFragment extends Fragment {
                             }
                         });
 
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                //startBackgroundJob();
 
+
+                            }
+                        }, 3000);
                     }
                 }).show(getFragmentManager());
 
@@ -275,6 +306,57 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
+
+  /*  private Runnable periodicClassify =
+            new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (lock) {
+                        if (runClassifier) {
+                            try {
+                               // classifyFrame();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }
+                    backgroundHandler.post(periodicClassify);
+                }
+
+            };*/
+
+
+   /* private void startBackgroundJob() {
+
+        backgroundThread = new HandlerThread(HANDLE_THREAD_NAME);
+        backgroundThread.start();
+        backgroundHandler = new Handler(backgroundThread.getLooper());
+        synchronized (lock) {
+            runClassifier = true;
+        }
+        backgroundHandler.post(periodicClassify);
+
+
+    }*/
+
+
+    private void classifyFrame(Bitmap globalBitmap) throws IOException {
+
+        Bitmap bm = this.globalBitmap;
+/*
+
+        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+        Log.d(TAG, "classifyFrame: GLOBAL bitmap from URI  : " + bitmap);
+*/
+
+        classifier.classifyFrame(globalBitmap);
+
+        Toast.makeText(getContext(), "TEXT : " + "", Toast.LENGTH_SHORT).show();
+
+    }
+
+
 
     private void getPendingDumpList() {
 
@@ -429,8 +511,16 @@ public class HomeFragment extends Fragment {
     @Override
     public void onStart() {
         UID = mAuth.getCurrentUser().getUid();
-
         refreshPendingList();
+
+       /* try {
+        //    classifier = new ImageClassifier(getActivity());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Failed to initialize an image classifier.");
+
+        }*/
+
         super.onStart();
     }
 

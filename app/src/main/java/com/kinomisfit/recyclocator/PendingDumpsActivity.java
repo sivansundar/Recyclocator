@@ -2,7 +2,6 @@ package com.kinomisfit.recyclocator;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -113,18 +112,8 @@ public class PendingDumpsActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
 
-                        String error = databaseError.getDetails();
-
-                        if (!error.isEmpty()) {
-
-                            Toast.makeText(PendingDumpsActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-
-
-                            Log.d(TAG, "onFailure: " + error);
-
-                        }
+                        Toast.makeText(PendingDumpsActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 });
             }
